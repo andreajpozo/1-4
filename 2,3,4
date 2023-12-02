@@ -1,0 +1,169 @@
+/*ejercicios 2,3,4*/
+#include <iostream>
+using namespace std;
+
+template <class T> struct nodo {
+  T valor;
+  nodo<T> *next;
+  nodo<T> *prev;
+  nodo(T v, nodo<T> *n = NULL, nodo<T> *p = NULL) {
+    valor = v;
+    next = n;
+    prev = p;
+  }
+};
+
+template <class T> class LE {
+public:
+  nodo<T> *head = nullptr;
+  void add(T v);
+  void del(T v);
+  bool find(T v);
+  void print();
+  void josephus();
+  ~LE();
+};
+
+
+//circular
+template <class T> 
+void LE<T>::add(T v) {
+  if (find(v) == 0) {
+    if (head == 0) {
+      head = new nodo<T>(v);
+      return;
+    }
+    nodo<T> *temp = head;
+    while (temp) {
+      if (temp->next == 0) {
+        temp->next = new nodo<T>(v);
+        return;
+      } else if (temp->valor > v) {
+        head = new nodo<T>(v, temp);
+        return;
+      } else if (temp->next->valor > v) {
+        temp->next = new nodo<T>(v, temp->next);
+        return;
+      }
+      temp = temp->next;
+    }
+  }
+}
+
+
+/*
+//doblemente enlazada 
+template <class T> void LE<T>::add(T v) {
+  if (find(v) == 0) {
+    if (head == 0) {
+      head = new nodo<T>(v);
+      return;
+    }
+    nodo<T> *temp = head;
+    while (temp) {
+      if (temp->next == 0) {
+        temp->next = new nodo<T>(v, 0, temp);
+        return;
+      } else if (temp->valor > v) {
+        head = new nodo<T>(v, temp);
+        head->next->prev = head;
+        return;
+      } else if (temp->next->valor > v) {
+        temp->next = new nodo<T>(v, temp->next, temp);
+        temp->next->next->prev = temp->next;
+        return;
+      }
+      temp = temp->next;
+    }
+  }
+}*/
+
+template <class T> void LE<T>::del(T v) {
+  if (head != 0 and find(v)) {
+    nodo<T> *temp = head;
+    if (head->valor == v) {
+      nodo<T> *next = head->next;
+      delete head;
+      head = next;
+      head->prev = 0;
+      return;
+    }
+    while (temp) {
+      if (temp->next->valor == v) {
+        nodo<T> *next = temp->next->next;
+        delete temp->next;
+        temp->next = next;
+        if (temp->next)
+          temp->next->prev = temp;
+        return;
+      }
+      temp = temp->next;
+    }
+  }
+}
+
+template <class T> LE<T>::~LE() {}
+
+template <class T> bool LE<T>::find(T v) {
+  if (head != 0) {
+    nodo<T> *temp = head;
+    while (temp) {
+      if (temp->valor == v) {
+        return 1;
+      }
+      temp = temp->next;
+    }
+  }
+  return 0;
+}
+
+template <class T> void LE<T>::josephus()
+{
+  if (!head) {
+    cout << "Lista vacía" << endl;
+    return;
+  }
+
+  int cont = 1;
+  nodo<T> *temp = head;
+  nodo<T> *sig = NULL;
+
+  while (head->next != head) {
+    if (cont % 3 == 0) {
+      cout << "del: " << temp->valor << endl;
+      sig = temp->next;
+      del(temp->valor);
+      temp = sig;
+    } else {
+      temp = temp->next;
+    }
+
+    cont++;
+  }
+
+  // Imprimir el último elemento que queda en la lista
+  cout << "Último elemento restante: " << head->valor << endl;
+}
+
+template <class T> void LE<T>::print() {
+  cout << "HEAD-> ";
+  for (nodo<T> *p = head; p; p = p->next)
+    cout << p->valor << "-> ";
+  cout << "NULL" << endl;
+}
+
+int main() {
+  LE<int> lista1;
+
+  lista1.add(1);
+  lista1.add(3);
+  lista1.add(2);
+  lista1.add(4);
+  lista1.add(5);
+  lista1.add(6);
+
+
+  lista1.print();
+
+  lista1.josephus();
+}
