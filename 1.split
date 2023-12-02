@@ -1,0 +1,130 @@
+#include <iostream>
+using namespace std;
+
+struct nodo
+{
+  int valor;
+  nodo* next;
+};
+
+bool par(int n)
+{
+  return (n % 2 == 0);
+}
+
+bool impar(int n)
+{
+  return (n % 2 == 1);
+}
+
+
+void insertar(nodo** h, int value)
+{
+  nodo* nuevo = new nodo;
+  nuevo->valor = value;
+  nuevo->next = *h;
+  *h = nuevo;
+}
+
+void swap1(nodo*& a, nodo*& b)
+{
+  nodo* aux = b->next;
+  b->next = b->next->next;
+  if (!a)
+  {
+    a = aux;
+  }
+  else
+  {
+    a->next = aux;
+    a = a->next;
+  }
+}
+
+void swap2(nodo*& a, nodo*& b)
+{
+  nodo* aux = b;
+  b = b->next;
+  if (!a)
+  {
+    a = aux;
+  }
+  else
+  {
+    a->next = aux;
+    a = a->next;
+  }
+}
+
+void Split(nodo*& a, nodo*& b, bool(*pf)(int))
+{
+  nodo* temporal = a;
+  nodo* aux = b;
+  while ((pf(a->valor)))
+  {
+    swap2(aux, a);
+    if (!b)
+    {
+      b = aux;
+    }
+  }
+  temporal= a;
+  for (; temporal ->next; temporal = temporal->next)
+  {
+    if ((pf(temporal->valor)))
+    {
+      swap1(aux, temporal);
+      if (!b)
+      {
+        b = aux;
+      }
+    }
+  }
+  aux->next = NULL;
+}
+
+int main()
+{
+  int array[] = { 11, 3, 2, 3, 4, 5, 6, 88, 90 };
+  int size = sizeof(array) / sizeof(array[0]);
+
+  nodo* head = NULL;
+
+  for (int i = size - 1; i >= 0; i--)
+  {
+    insertar(&head, array[i]);
+  }
+
+  nodo* A = NULL;
+
+  cout << "Lista completa: ";
+  nodo* a = head;
+  while (a != NULL)
+  {
+    cout << a ->valor << "->";
+    a = a->next;
+  }
+  cout << "NULL" << endl;
+
+  Split(head, A, impar);
+
+  cout << "Lista A: ";
+  nodo* tempA = A;
+  while (tempA != NULL)
+  {
+    cout << tempA->valor << "->";
+    tempA = tempA->next;
+  }
+  cout << "NULL" << endl;
+
+  cout << "Lista B: ";
+  nodo* tempB = head;  
+  while (tempB != NULL)
+  {
+    cout << tempB->valor << "->";
+    tempB = tempB->next;
+  }
+  cout << "NULL" << endl;
+
+  return 0;
+}
